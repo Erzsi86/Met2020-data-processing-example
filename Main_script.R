@@ -35,17 +35,17 @@ setwd("...") # e.g. setwd("C:/Stat_analysis")
 
 ### CITATIONS OF DATABASES ###
 
-# Hersbach, H., Bell, B., Berrisford, P., Hirahara, S., Horányi, A., Munoz-Sabater, J., Nicolas, J., 
+# Hersbach, H., Bell, B., Berrisford, P., Hirahara, S., HorÃ¡nyi, A., Munoz-Sabater, J., Nicolas, J., 
 # Peubey, C., Radu, R., Schepers, D., Simmons, A., et al., 2020: The ERA5 global reanalysis. Quarterly
-# Journal of the Royal Meteorological Society, 146, 1999–2049. https://doi.org/10.1002/qj.3803
+# Journal of the Royal Meteorological Society, 146, 1999â€“2049. https://doi.org/10.1002/qj.3803
 
 # Kalnay, E., Kanamitsu, M., Kistler, R., Collins, W., Deaven, D., Gandin, L., Iredell, M., Saha, S.,
 # White, G., Woollen, J., et al., 1996: The NCEP/NCAR 40-Year Reanalysis Project. Bulletin of the
-# American Meteorological Society, 77(3), 437–472.
+# American Meteorological Society, 77(3), 437â€“472.
 # https://doi.org/10.1175/1520-0477(1996)077<0437:TNYRP>2.0.CO;2
 
 # Kanamitsu, M., Ebisuzaki, W., Woollen, J., Yang S-K., Hnilo, J.J., Fiorino, M., Potter, G.L., 2002:
-# NCEP-DOE AMIP-II Reanalysis (R-2). Bulletin of the American Meteorological Society, 83(11), 1631–1644.
+# NCEP-DOE AMIP-II Reanalysis (R-2). Bulletin of the American Meteorological Society, 83(11), 1631â€“1644.
 # https://doi.org/10.1175/BAMS-83-11-1631
 
 
@@ -90,8 +90,8 @@ NCEPdownload(year=year, month=month, latitude=latitude, longitude=longitude,
 
 ### Input parameter for ERA5download function to get ERA5 data:
 # Identifier at Copernicus:
-user <- "18692"
-API  <- "1357b6b7-846d-40bb-bc10-681cb31f34bd"
+user <- ...
+API  <- ...
 
 year <- c(1981,2010)                          # choosing time interval in years
 month <- "01"                                 # giving the list of months
@@ -255,8 +255,8 @@ round(rcorr(pc1[,c(3,6,9)])$r, digits=3)
 examined_field <- "eof1" # "eof1" or "absmincor"
 
 # Axis, labels and colorbars, plot name:
-x <- c("","-60°","-40°","-20°","0°","20°","40°")
-y <- c("20°","40°","60°","80°")
+x <- c("","-60Â°","-40Â°","-20Â°","0Â°","20Â°","40Â°")
+y <- c("20Â°","40Â°","60Â°","80Â°")
 periods <- paste0("                         1981-2010                         ", 
                   "                   1986-2015                         ",
                   "                   1991-2020                         ")

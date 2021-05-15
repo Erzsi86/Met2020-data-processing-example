@@ -2,21 +2,22 @@
 ###################### DESCRIPTION ######################
 #########################################################
 
-### A) This script downloads gridded time series of geopotential data from three reanalyses
-###    to detect atmospheric teleconnections by using the functions in Downloading_data.R.
+### (A) This script downloads gridded time series of geopotential data from three reanalyses
+###     to detect atmospheric teleconnections by using the functions in Downloading_data.R.
 
-### B) Monthly geopotential height anoamlies are calculated on which correlation analysis 
-###    (i.e. teleconnectivity method) (1) and principal component analysis (PCA) (2) are executed
-###    by using the function in Data_procession_and_computation.R.
+### (B) Monthly geopotential height anoamlies are calculated on which correlation analysis 
+###     (i.e. teleconnectivity method) (1) and principal component analysis (PCA) (2) are executed
+###     by using the function in Data_procession_and_computation.R.
+###     IMPORTANT: If you have ERA or NCEP data then you can skip step (A).
 
-### C) Based on (1) strongest negative Pearson correlations are computed in each grid cell
-###    and potential action centers (PotACs) are determined. (PotACs are grid cells that
-###    are associated with correlations which are in one-to-one correspondence with each other.)
-###    The first principal component (PC1) time series is examined.
+### (C) Based on (1) strongest negative Pearson correlations are computed in each grid cell
+###     and potential action centers (PotACs) are determined. (PotACs are grid cells that
+###     are associated with correlations which are in one-to-one correspondence with each other.)
+###     The first principal component (PC1) time series is examined.
 
-### D) The fields of strongest negative correlations and the first empirical orthogonal
-###    function (EOF1) are visualized on maps. Customized colorbar is made by applying
-###    the function in "Creating_colorbar.R". Barplots of the PC1 times series are created.
+### (D) The fields of strongest negative correlations and the first empirical orthogonal
+###     function (EOF1) are visualized on maps. Customized colorbar is made by applying
+###     the function in "Creating_colorbar.R". Barplots of the PC1 times series are created.
 
 ### IMPORTANT: Data of NCEP-NCAR Reanalysis 1, NCEP-DOE Reanalysis 2 and ERA5 are used.
 ### To download data from ERA5, registration is required at the Copernicus Climate Data Store:
@@ -120,7 +121,13 @@ ERA5download(year=year, month=month, day=day, hour=hour, lat1=lat1, lat2=lat2,
 #############################################################
 
 ### Input parameters:
-input_file <- "geopot500_ERA5_1981-2020.nc" # "geopot500_ERA5_1981-2020.nc" # "geopot500_NCEP1_1981-2020.rds" # "geopot500_NCEP2_1981-2020.rds"
+# Examined database:
+# "NCEP" if NCEP-NCAR Reanalysis 1 or NCEP-DOE Reanalysis 2 is examined. "ERA5" if ERA5 is examined.
+dataset <- "ERA5"
+input_file <- "geopot500_ERA5_1981-2020.nc"
+
+# Names of datasets:
+id <- c("ERA5_81","ERA5_86","ERA5_91",  "NCEP1_81","NCEP1_86","NCEP1_91",  "NCEP2_81","NCEP2_86","NCEP2_91")
 
 # Area, resolution (in degree) and time interval of the examination: North-Atlantic region
 lon1A     <- -75
@@ -131,15 +138,8 @@ res       <- 2.5
 startDate <- "1981-01-01 00:00:00"
 endDate   <- "2010-01-31 00:00:00"
 
-# Names of datasets:
-id <- c("ERA5_81","ERA5_86","ERA5_91",  "NCEP1_81","NCEP1_86","NCEP1_91",  "NCEP2_81","NCEP2_86","NCEP2_91")
-
 # Number of Monte Carlo simulation: to carry out permutation test on the correlation field:
-experience_nr <- 1000
-
-# Examined database:
-# "NCEP" if NCEP-NCAR Reanalysis 1 or NCEP-DOE Reanalysis 2 is examined. "ERA5" if ERA5 is examined.
-dataset <- "ERA5"
+exp_nr <- 1000
 
 # Obtaining strongest negative correlation fields and do PCA from monthly averages:
 corr_pca_monthly_anom(input_path=getwd(), input_file=input_file, dataset=dataset,
@@ -231,7 +231,6 @@ pc1 <- matrix(unlist(pc1_time_series), nrow=length(unlist(pc1_time_series))/leng
 
 if(!exists(id)) {
   colnames(pc1) <- id
-  rownames(pc1) <- id
 }
 
 # Correlation matrix:
@@ -280,6 +279,7 @@ if(examined_field == "absmincor") {
 }
 
 if(examined_field == "eof1") {  
+  res_list <- list(NA)
   plotname <- "eof1.png"
   plotname2 <- "pc1.png"
   brks <- seq(-0.06,0.06,0.01)
@@ -317,13 +317,13 @@ png(plotname, units="in", width=30, height=24, res=300, pointsize=54)
            }
         }
       }
-    }
-      
+        
     points(x=c(coord_mod_list[[i]]$lon1, coord_mod_list[[i]]$lon2),
            y=c(coord_mod_list[[i]]$lat1, coord_mod_list[[i]]$lat2), pch=16, col=cols_of_AC)
     arrows(x0=coord_mod_list[[i]]$lon1, y0=coord_mod_list[[i]]$lat1,
            x1=coord_mod_list[[i]]$lon2, y1=coord_mod_list[[i]]$lat2,
            lwd=2, col=cols_of_AC, code=0)
+    }
     
     if (examined_field == "eof1") {
       mtext(text=paste0(round(res_list_pca[[i]]$sdev[1], digits=0), " %"), side=3, adj=1, cex=0.7)
@@ -335,19 +335,22 @@ png(plotname, units="in", width=30, height=24, res=300, pointsize=54)
     axis(3, at=c(-180,180), tick=TRUE, labels=FALSE, tck=0.01)
     axis(c(2,4), at=c(-90,90), tick=TRUE, labels=FALSE, tck=0.01)
   }
-  if (examined_field == "absmincor") (par(fig=c(0.01,0.5,0.15,0.28), new=TRUE))
-  if (examined_field == "eof1") (par(fig=c(0.12,0.88,0.16,0.31), new=TRUE))
-  colorbar_horizontal(col=colors, brks=brks, height=4) # colorbar of absmincors in the 4th row
-  if (examined_field == "absmincor") (par(fig=c(0.5,0.99,0.15,0.28), new=TRUE))
-  colorbar_horizontal(col=colors_AC, brks=brks, height=4, cex.axis=0.8) # colorbar of potACs in the 4th row
+  if (examined_field == "absmincor") {
+    par(fig=c(0.01,0.5,0.15,0.28), new=TRUE)
+    par(fig=c(0.5,0.99,0.15,0.28), new=TRUE)
+    colorbar_horizontal(col=colors_AC, brks=brks, height=4, cex.axis=0.8) # colorbar of potACs in the 4th row
+    colorbar_horizontal(col=colors, brks=brks, height=4) # colorbar of absmincors in the 4th row
+   }
+   if (examined_field == "eof1") {
+     par(fig=c(0.12,0.88,0.16,0.31), new=TRUE)
+   }
 graphics.off()
 
 # Cut of margins:
 plot <- image_trim(image_read(plotname))
 image_write(plot, path=paste0("cropped_",plotname), format="png")
 
-
-
+    
 ######### Barplots of PC1 #########
 
 ### Constructing indices from 1981 to 2020 just to exemplify creating barplots with base R functions:
@@ -374,7 +377,7 @@ par(omi=c(1.3,0,0,0)) # configure outer margin
 par(mfrow=c(3,1),
     mar=c(1.8,2.7,1.5,0.2)) # configure margin of each plot
   for (mod in 1:ncol(pc_indices)) {
-    barp <- barplot(pc_indices[,mod], ylim=c(-3,3), col=as.character(ifelse(pc1_index>=0, "red", "blue")),
+    barp <- barplot(pc_indices[,mod], ylim=c(-3,3), col=as.character(ifelse(pc_indices[,1]>=0, "red", "blue")),
                     xaxs="i", yaxs="i", axes=FALSE, ann=FALSE)
     title(ylab="Standardized index", line=1.8)
     axis(1, at=barp, labels=years, las=2)
